@@ -76,7 +76,7 @@
     BACKWARD_1: 3,
     TURN_LEFT: 4,
     TURN_RIGHT: 5,
-    U_TUEN: 6
+    U_TURN: 6
   } ;
 
   let board_image = document.getElementById("board") ;
