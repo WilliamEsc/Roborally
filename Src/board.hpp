@@ -139,62 +139,65 @@ struct Board {
     /* 51 */  NONE 
   } ;
 
-  /* the tiles are stored in a hash table */
+    /* the tiles are stored in a hash table */
 
-  std::unordered_map<Location, TileType, LocationHash> tiles ;
+    std::unordered_map<Location, TileType, LocationHash> tiles ;
 
-} ;
+  } ;
 
-class Cellule {
-public:
-  std::vector<Cellule*> tab;
-  Robot::Status stat;
-  Location loc;
+  class Cellule {
+  public:
+    std::vector<Cellule*> tab;
 
-  Cellule(Robot::Status s, Location l);
+    Robot::Status stat;
+    Location loc;
 
-  ~Cellule();
-} ;
+    Cellule(Robot::Status s, Location l);
 
-class Graph
-{
-  public :
+    //~Cellule();
+  } ;
 
-    /* construction d'une liste vide */
-    Graph(unsigned int x_, unsigned int y_) ;
+  class Graph
+  {
+    public :
 
-    /* construction par copie */
-    Graph(const Graph& autre) ;
+      /* construction d'une liste vide */
+      Graph(unsigned int x_, unsigned int y_, std::string b) ;
 
-    /* affectation */
-    Graph& operator=(const Graph& autre) ;
+      /* construction par copie */
+      Graph(const Graph& autre) ;
 
-    /* destruction */
-    ~Graph() ;
+      /* affectation */
+      Graph& operator=(const Graph& autre) ;
 
-    /* consultation de la tete */
-    const Cellule* tete() const ;
-    Cellule* tete() ;
+      /* destruction */
+      ~Graph() ;
 
-    /* insert l'élément dans la liste */
-    void insert(int v);
+      /* consultation de la tete */
+      const Cellule* tete() const ;
+      Cellule* tete() ;
 
-    /* taille de la liste */
-    int taille() const ;
+      /* insert l'élément dans la liste */
+      void insert(int v);
 
-    /* recherche dans la liste */
-    Cellule* recherche(int v) ;
+      /* taille de la liste */
+      int taille() const ;
 
-    /* affichage */
-    void afficher() const ;
+      /* recherche dans la liste */
+      Cellule* recherche(int v) ;
 
-  private :
+      /* affichage */
+      void afficher() const ;
 
-    Cellule* first;
-    unsigned int x, y;
+    private :
+
+      std::vector<std::vector<std::vector<Cellule*>>> tabCell;
+      Cellule* dead;
+      unsigned int x, y;
+      std::string str_board;
 
 
-} ;
+  } ;
 
 } //end of namespace RR
 
