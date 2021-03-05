@@ -163,6 +163,7 @@ struct Board {
 
       /* construction d'une liste vide */
       Graph(unsigned int x_, unsigned int y_, std::string b) ;
+      Graph(unsigned int x_, unsigned int y_, Board b) ;
 
       /* construction par copie */
       Graph(const Graph& autre) ;
