@@ -3,7 +3,7 @@ CXX      = g++
 .DEFAULT_GOAL := all
 
 SOURCES = 
-SOURCES += board.cpp
+SOURCES += board.cpp graph.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 
@@ -18,7 +18,7 @@ TARGETS =
 
 ########## test_board ##########
 
-TEST_BOARD_SOURCES = test_board.cpp
+TEST_BOARD_SOURCES = test_board.cpp 
 TEST_BOARD_OBJECTS = $(TEST_BOARD_SOURCES:.cpp=.o)
 
 test_board : $(TEST_BOARD_OBJECTS) $(OBJECTS) $(HEADERS)

@@ -1,4 +1,5 @@
 #include "board.hpp"
+#include "graph.hpp"
 
 #include <iostream>
 
@@ -9,7 +10,7 @@ int main() {
   //RR::Graph g(2, 2, "board.txt");
   //g.afficher();
 
-  RR::Graph g2(2, 2, b);
+  Graph g2(2, 2, b);
   g2.afficher();
 
   return 0 ;
