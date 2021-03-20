@@ -33,6 +33,7 @@ struct LocationHash {
 
 /* Robot */
 
+
 struct Robot {
 
   /* Robot movements */
@@ -50,17 +51,25 @@ struct Robot {
   /* Robot status (mostly orientation) */
   
   enum struct Status {
-    EAST,
-    NORTH,
-    WEST,
-    SOUTH,
-    DEAD
+    EAST=0,
+    NORTH=1,
+    WEST=2,
+    SOUTH=3,
+    DEAD=4
   } ;
 
   /* A robot contains a location an a status */
 
   Location location ;
   Status status ;
+
+  Robot();
+  Robot(const Location& loc,const Status& stat);
+  bool operator==(const Robot& r2)const;
+} ;
+
+struct RobotHash {
+  std::size_t operator()(const Robot& r) const ;
 } ;
 
 /* Board */

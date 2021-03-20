@@ -174,6 +174,26 @@ namespace RR
   }
 
   /**** Robot ****/
+  std::size_t RobotHash::operator()(const Robot& r) const {
+  //create a bitset to pack line column and orientation
+  std::bitset<16*sizeof(int) + 8*sizeof(Robot::Status)> concat ;
+  //pack the line
+  concat |= r.location.line ;
+  concat <<= 8*sizeof(int) ;
+  //pack the colum,
+  concat |= r.location.column ;
+  concat <<= 8*sizeof(Robot::Status) ;
+  //pack the orientation
+  concat |= +r.status ;
+  //hash the bitset using the standard implementation on bitsets
+  return std::hash< std::bitset<16*sizeof(int) + 8*sizeof(Robot::Status)> >()(concat) ;
+}
+
+  Robot::Robot():location(),status(){}
+  Robot::Robot(const Location& loc,const Status& stat):location(loc),status(stat){}
+  bool Robot::operator==(const Robot& r2)const{
+    return location == r2.location && status==r2.status;
+  }
 
   /** Moving **/
 

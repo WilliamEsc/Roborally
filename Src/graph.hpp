@@ -8,13 +8,21 @@ class Cellule {
   public:
     std::vector<Cellule*> tab;
 
-    Robot::Status stat;
-    Location loc;
+    Robot robot;
 
     Cellule(Robot::Status s, Location l);
 
     //~Cellule();
   } ;
+
+    class Case{
+    public:
+    RR::Robot parent;
+    int poids;
+
+    Case(Robot r, int p);
+    Case();
+  };
 
   class Graph
   {
@@ -23,6 +31,8 @@ class Cellule {
       /* construction d'une liste vide */
       Graph(unsigned int x_, unsigned int y_, std::string b) ;
       Graph(unsigned int x_, unsigned int y_, Board b) ;
+
+      std::vector<Case> dijkstra(Robot start, Location arrive);
 
       /* construction par copie */
       Graph(const Graph& autre) ;
@@ -58,5 +68,27 @@ class Cellule {
 
 
   } ;
+
+
+
+class tasB{
+  public:
+std::vector<Case> tb;
+std::unordered_map<Robot, int, RobotHash> ind;
+
+
+
+tasB();
+
+int insert_modify(Case c);
+
+Case pop();
+
+int get_poids(Robot r);
+
+bool empty();
+
+};
+
 
 #endif
