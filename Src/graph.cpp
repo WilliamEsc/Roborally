@@ -248,7 +248,7 @@ tasB::tasB() : tb(0) {}
 int tasB::insert_modify(Case c)
 {
   std::unordered_map<Robot, int>::const_iterator got = ind.find(c.parent);
-  if (got == ind.end())
+  if (got == ind.end()) //le robot n'est pas présent dans le tas
   {
     //insert
     //std::cout << "ins ";
@@ -258,13 +258,13 @@ int tasB::insert_modify(Case c)
     {
       //std::cout<<(int (i-1)/2);
       tb[i] = tb[(int(i - 1) / 2)];
-      ind[tb[i].parent]=i;
+      ind[tb[i].parent] = i; //modifier les indices des robots que l'on déplace
       i = (int(i - 1) / 2);
     }
     ind[c.parent] = i;
     return 1;
   }
-  else
+  else //le robot est présent dans le tas
   {
     //modify
     //std::cout << "mod ";
@@ -274,7 +274,7 @@ int tasB::insert_modify(Case c)
       while (i > 0 && c.poids < tb[(int(i - 1) / 2)].poids)
       {
         tb[i] = tb[(int(i - 1) / 2)];
-        ind[tb[i].parent]=i;
+        ind[tb[i].parent] = i; //modifier les indices des robots que l'on déplace
         i = (int(i - 1) / 2);
       }
       tb[i] = c;
@@ -289,7 +289,8 @@ Case tasB::pop()
 {
   Case ret = tb[0];
   int s = tb.size() - 1;
-  if(s==0){
+  if (s == 0)
+  {
     tb.pop_back();
     ind.erase(ret.parent);
     return ret;
@@ -302,13 +303,13 @@ Case tasB::pop()
     if (2 * i + 2 < s && tb[2 * i + 1].poids > tb[2 * i + 2].poids)
     {
       tb[i] = tb[2 * i + 2];
-      ind[tb[2 * i + 2].parent] = i;
+      ind[tb[2 * i + 2].parent] = i; //modifier les indices des robots que l'on déplace
       i = 2 * i + 2;
     }
     else
     {
       tb[i] = tb[2 * i + 1];
-      ind[tb[2 * i + i].parent] = i;
+      ind[tb[2 * i + i].parent] = i; //modifier les indices des robots que l'on déplace
       i = 2 * i + 1;
     }
   }
@@ -344,10 +345,10 @@ Case::Case() : parent(), poids(-1) {}
 std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
 {
   //std::cout << "start ";
-  std::unordered_map<Robot, Case, RobotHash> road;
+  std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
   Case r(start, 0);
   road[start] = r;
-  tasB s; //faire un tas binaire
+  tasB s;
   s.insert_modify(r);
   while (!s.empty())
   {
@@ -363,19 +364,15 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
         if (got == road.end())
         {
           //not found
-          dw= -1;
+          dw = -1;
         }
         else
         {
           //found
-          dw=road.at(r->robot).poids;
+          dw = road.at(r->robot).poids;
         }
-/*         if(temp.parent == start){
-          std::cout<<r->robot.location.column<<r->robot.location.line << (int)r->robot.status<<"ici ";
-        } */
         if ((dw == -1) || (dw > temp.poids + 1))
         {
-          //if(dw==-1){std::cout<<"$"<<r->robot.location.column<<r->robot.location.line<<(int)r->robot.status<<"$";}
           //std::cout << "in-" << temp.poids;
           Case maj(temp.parent, temp.poids + 1);
           road[r->robot] = maj;
@@ -386,14 +383,15 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
     //std::cout << std::endl;
   }
 
-  for(auto& r:road){
-    std::cout<<r.first.location.column<<r.first.location.line<<r.second.poids<<std::endl;
+  for (auto &r : road)
+  {
+    std::cout << r.first.location.column << r.first.location.line << r.second.poids << std::endl;
   }
-
+  
+  //choix du robot en position final avec le poids le plus faible
   Robot final = {arrive, (Robot::Status)0};
   for (int i = 1; i < 4; i++)
   {
-    //std::cout << "insert "<<road[final].poids;
     Robot test = {arrive, (Robot::Status)i};
     if (road[final].poids >= road[test].poids)
     {
@@ -401,13 +399,14 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
     }
   }
 
+  //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
   std::vector<Case> ret;
   Case chemin = road[final];
-  while(!(chemin.parent == start)){
-      //std::cout<<chemin.poids<< "pp ";
-      ret.push_back(chemin);
-      chemin=road[chemin.parent];
-    }
+  while (!(chemin.parent == start))
+  {
+    ret.push_back(chemin);
+    chemin = road[chemin.parent];
+  }
   ret.push_back(chemin);
   return ret;
 }
