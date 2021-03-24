@@ -31,8 +31,7 @@ class Graph
 {
 public:
   /* construction d'une liste vide */
-  Graph(unsigned int x_, unsigned int y_, std::string b);
-  Graph(unsigned int x_, unsigned int y_, Board b);
+  Graph( Board b);
 
   std::vector<Case> dijkstra(Robot start, Location arrive);
 
@@ -64,7 +63,6 @@ public:
 private:
   std::vector<std::vector<std::vector<Cellule *>>> tabCell;
   Cellule *dead;
-  unsigned int x, y;
   std::string str_board;
 };
 

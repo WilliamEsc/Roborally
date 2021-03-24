@@ -10,7 +10,7 @@ int main() {
   //RR::Graph g(2, 2, "board.txt");
   //g.afficher();
 
-  Graph g2(2, 2, b);
+  Graph g2(b);
   g2.afficher();
   RR::Robot start(RR::Location((int)0,(int) 1),(RR::Robot::Status) 3);
   RR::Location end={1, 0};
