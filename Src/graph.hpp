@@ -2,6 +2,7 @@
 #define GRAPH_HPP_
 
 #include "board.hpp"
+#include <unordered_map>
 using namespace RR;
 
 class Cellule

@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <queue>
+#include <unordered_map>
+
+using namespace RR;
 
 Cellule::Cellule(Robot::Status s, Location l) : robot({l, s}) {}
 
@@ -247,7 +250,7 @@ tasB::tasB() : tb(0) {}
 
 int tasB::insert_modify(Case c)
 {
-  std::unordered_map<Robot, int>::const_iterator got = ind.find(c.parent);
+  std::unordered_map<Robot, int, RobotHash>::const_iterator got = ind.find(c.parent);
   if (got == ind.end()) //le robot n'est pas présent dans le tas
   {
     //insert
@@ -321,7 +324,7 @@ Case tasB::pop()
 
 int tasB::get_poids(Robot r)
 {
-  std::unordered_map<Robot, int>::const_iterator got = ind.find(r);
+  std::unordered_map<Robot, int, RobotHash>::const_iterator got = ind.find(r);
   if (got == ind.end())
   {
     //not found
@@ -360,7 +363,7 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
       if (r != nullptr && r->robot.status != Robot::Status::DEAD)
       {
         int dw;
-        std::unordered_map<Robot, Case>::const_iterator got = road.find(r->robot);
+        std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(r->robot);
         if (got == road.end())
         {
           //not found

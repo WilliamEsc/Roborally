@@ -28,7 +28,7 @@ struct Location {
 /* hash function for locations */
 
 struct LocationHash {
-  std::size_t operator()(const Location& l) const ;
+  std::size_t operator() (const Location& l) const ;
 } ;
 
 /* Robot */
