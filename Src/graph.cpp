@@ -9,8 +9,7 @@ using namespace RR;
 
 Cellule::Cellule(Robot::Status s, Location l) : robot({l, s}) {}
 
-
-Graph::Graph( Board b) :tabCell(0)
+Graph::Graph(Board b) : tabCell(0)
 {
   dead = nullptr;
 
@@ -237,7 +236,7 @@ bool tasB::empty()
 Case::Case(Robot r, int p) : parent(r), poids(p) {}
 Case::Case() : parent(), poids(-1) {}
 
-std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
+std::vector<int> Graph::dijkstra(Robot start, Location arrive)
 {
   //std::cout << "start ";
   std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
@@ -248,7 +247,7 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
   while (!s.empty())
   {
     //std::cout << "1 ";
-    Case temp = s.pop();//Attention ici temp est issue du tas donc parent est le robot en lui meme avec son poids
+    Case temp = s.pop(); //Attention ici temp est issue du tas donc parent est le robot en lui meme avec son poids
     for (int x = 0; x < 7; x++)
     {
       Cellule *r = tabCell[temp.parent.location.line][temp.parent.location.column][(int)temp.parent.status]->tab[x];
@@ -282,7 +281,7 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
   {
     std::cout << r.first.location.column << r.first.location.line << r.second.poids << std::endl;
   }
-  
+
   //choix du robot en position final avec le poids le plus faible
   Robot final = {arrive, (Robot::Status)0};
   for (int i = 1; i < 4; i++)
@@ -295,13 +294,40 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
   }
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
-  std::vector<Case> ret;
+  std::vector<int> ret;
   Case chemin = road[final];
+  Cellule *test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
   while (!(chemin.parent == start))
   {
-    ret.push_back(chemin);
-    chemin = road[chemin.parent];
+    for (int i = 0; i < 7; i++)
+    {
+      if (test->tab[i]!= nullptr){
+      if( test->tab[i]->robot == final)
+      {
+        std::cout<<final.location.column<<final.location.line<<(int) final.status<<" in ";
+        std::cout << i<<std::endl;
+        ret.push_back(i);
+        final = chemin.parent;
+        chemin = road[final];
+        test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
+        break;
+      }else{
+        std::cout<<final.location.column<<final.location.line<<(int) final.status<<" diff de ";
+        std::cout<<test->tab[i]->robot.location.column<<test->tab[i]->robot.location.line<<(int) test->tab[i]->robot.status<<std::endl;
+      }
+      }
+    }
   }
-  ret.push_back(chemin);
+  for (int i = 0; i < 7; i++)
+  {
+    if (test->tab[i]!= nullptr && test->tab[i]->robot == final)
+    {
+      ret.push_back(i);
+      test = tabCell[final.location.line][final.location.column][(int) final.status];
+      final = chemin.parent;
+      chemin = road[chemin.parent];
+      break;
+    }
+  }
   return ret;
 }

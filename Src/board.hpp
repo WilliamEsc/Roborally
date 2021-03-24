@@ -37,15 +37,16 @@ struct LocationHash {
 struct Robot {
 
   /* Robot movements */
+  std::string move[7]={"FORWARD_1","FORWARD_2","FORWARD_3","BACKWARD_1","TURN_LEFT","TURN_RIGHT","U_TURN"};
 
   enum struct Move {
-    FORWARD_1,
-    FORWARD_2,
-    FORWARD_3,
-    BACKWARD_1,
-    TURN_LEFT,
-    TURN_RIGHT,
-    U_TURN
+    FORWARD_1=0,
+    FORWARD_2=1,
+    FORWARD_3=2,
+    BACKWARD_1=3,
+    TURN_LEFT=4,
+    TURN_RIGHT=5,
+    U_TURN=6
   } ;
   
   /* Robot status (mostly orientation) */
