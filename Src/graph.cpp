@@ -248,7 +248,7 @@ std::vector<Case> Graph::dijkstra(Robot start, Location arrive)
   while (!s.empty())
   {
     //std::cout << "1 ";
-    Case temp = s.pop();
+    Case temp = s.pop();//Attention ici temp est issue du tas donc parent est le robot en lui meme avec son poids
     for (int x = 0; x < 7; x++)
     {
       Cellule *r = tabCell[temp.parent.location.line][temp.parent.location.column][(int)temp.parent.status]->tab[x];
