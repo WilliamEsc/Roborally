@@ -15,7 +15,7 @@ int main()
   RR::Robot start(RR::Location(0, 1), (RR::Robot::Status)3);
   RR::Location end = {1, 0};
   std::vector<int> res;
-  g2.dijkstra(start, end, res);
+  res=g2.dijkstra(start, end);
   std::cout << std::endl;
   if (res.size() > 0)
   {
@@ -28,8 +28,8 @@ int main()
   {
     std::cout << "Aucune route possible" << std::endl;
   }
-  end = {1, 0};
-  g2.dijkstra(start, end, res);
+  end = {4, 0};
+  res= g2.dijkstra(start, end);
   std::cout << std::endl;
   std::cout << std::endl;
 

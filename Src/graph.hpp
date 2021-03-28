@@ -33,7 +33,7 @@ public:
   /* construction d'une liste vide */
   Graph( Board b);
 
-  void dijkstra(const Robot& start,const Location& arrive,std::vector<int>& res);
+  std::vector<int> dijkstra(const Robot& start,const Location& arrive);
 
   /* construction par copie */
   Graph(const Graph &autre);

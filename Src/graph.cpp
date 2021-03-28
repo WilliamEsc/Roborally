@@ -223,7 +223,7 @@ bool tasB::empty()
 Case::Case(const Robot &r, const int &p) : parent(r), poids(p) {}
 Case::Case() : parent(), poids(-1) {}
 
-void Graph::dijkstra(const Robot &start, const Location &arrive, std::vector<int> &res)
+std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
 {
   //std::cout << "start ";
   std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
@@ -281,6 +281,7 @@ void Graph::dijkstra(const Robot &start, const Location &arrive, std::vector<int
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
   std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(final);
+  std::vector<int> res;
   if (got != road.end())
   {
         //found
@@ -315,5 +316,5 @@ void Graph::dijkstra(const Robot &start, const Location &arrive, std::vector<int
       }
     }
   }
-
+  return res;
 }
