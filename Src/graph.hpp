@@ -12,7 +12,7 @@ public:
 
   Robot robot;
 
-  Cellule(Robot::Status s, Location l);
+  Cellule(const Robot::Status& s,const Location& l);
 
   //~Cellule();
 };
@@ -23,7 +23,7 @@ public:
   RR::Robot parent;
   int poids;
 
-  Case(Robot r, int p);
+  Case(const Robot& r,const int& p);
   Case();
 };
 
@@ -33,7 +33,7 @@ public:
   /* construction d'une liste vide */
   Graph( Board b);
 
-  std::vector<int> dijkstra(Robot start, Location arrive);
+  void dijkstra(const Robot& start,const Location& arrive,std::vector<int>& res);
 
   /* construction par copie */
   Graph(const Graph &autre);
@@ -63,7 +63,6 @@ public:
 private:
   std::vector<std::vector<std::vector<Cellule *>>> tabCell;
   Cellule *dead;
-  std::string str_board;
 };
 
 class tasB
@@ -73,12 +72,12 @@ public:
   std::unordered_map<Robot, int, RobotHash> ind;//permet de retrouver l'indice de chaque robot
 
   tasB();
+  ~tasB();
 
-  int insert_modify(Case c);
+  int insert_modify(const Case& c);
 
   Case pop();
 
-  int get_poids(Robot r);
 
   bool empty();
 };

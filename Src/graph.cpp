@@ -7,11 +7,10 @@
 
 using namespace RR;
 
-Cellule::Cellule(Robot::Status s, Location l) : robot({l, s}) {}
+Cellule::Cellule(const Robot::Status &s, const Location &l) : robot({l, s}) {}
 
-Graph::Graph(Board b) : tabCell(0)
+Graph::Graph(Board b) : tabCell(), dead(nullptr)
 {
-  dead = nullptr;
 
   //on fait les aretes
   Robot::Move tabMoves[7] = {
@@ -24,16 +23,14 @@ Graph::Graph(Board b) : tabCell(0)
       Robot::Move::U_TURN};
 
   Robot::Status s[4] = {
-      Robot::Status::EAST,
-      Robot::Status::NORTH,
       Robot::Status::WEST,
+      Robot::Status::NORTH,
+      Robot::Status::EAST,
       Robot::Status::SOUTH};
 
   //initialisation du tableau (les cases)
-  std::vector<std::vector<Cellule *>> v1;
-  std::vector<Cellule *> v2;
-  v1.clear();
-  v2.clear();
+  std::vector<std::vector<Cellule *>> v1(0);
+  std::vector<Cellule *> v2(0);
   Location spot;
 
   for (auto &it : b.tiles)
@@ -137,9 +134,14 @@ Graph::~Graph()
   }
 }
 
-tasB::tasB() : tb(0) {}
+tasB::tasB() : ind()
+{
+}
+tasB::~tasB()
+{
+}
 
-int tasB::insert_modify(Case c)
+int tasB::insert_modify(const Case &c)
 {
   std::unordered_map<Robot, int, RobotHash>::const_iterator got = ind.find(c.parent);
   if (got == ind.end()) //le robot n'est pas présent dans le tas
@@ -203,7 +205,7 @@ Case tasB::pop()
     else
     {
       tb[i] = tb[2 * i + 1];
-      ind[tb[2 * i + i].parent] = i; //modifier les indices des robots que l'on déplace
+      ind[tb[2 * i + 1].parent] = i; //modifier les indices des robots que l'on déplace
       i = 2 * i + 1;
     }
   }
@@ -213,37 +215,22 @@ Case tasB::pop()
   return ret;
 }
 
-int tasB::get_poids(Robot r)
-{
-  std::unordered_map<Robot, int, RobotHash>::const_iterator got = ind.find(r);
-  if (got == ind.end())
-  {
-    //not found
-    return -1;
-  }
-  else
-  {
-    //found
-    return tb[ind.at(r)].poids;
-  }
-}
-
 bool tasB::empty()
 {
   return tb.empty();
 }
 
-Case::Case(Robot r, int p) : parent(r), poids(p) {}
+Case::Case(const Robot &r, const int &p) : parent(r), poids(p) {}
 Case::Case() : parent(), poids(-1) {}
 
-std::vector<int> Graph::dijkstra(Robot start, Location arrive)
+void Graph::dijkstra(const Robot &start, const Location &arrive, std::vector<int> &res)
 {
   //std::cout << "start ";
   std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
-  Case r(start, 0);
-  road[start] = r;
+  Case st(start, 0);
+  road[start] = st;
   tasB s;
-  s.insert_modify(r);
+  s.insert_modify(st);
   while (!s.empty())
   {
     //std::cout << "1 ";
@@ -277,57 +264,56 @@ std::vector<int> Graph::dijkstra(Robot start, Location arrive)
     //std::cout << std::endl;
   }
 
-  for (auto &r : road)
-  {
-    std::cout << r.first.location.column << r.first.location.line << r.second.poids << std::endl;
-  }
-
   //choix du robot en position final avec le poids le plus faible
   Robot final = {arrive, (Robot::Status)0};
   for (int i = 1; i < 4; i++)
   {
-    Robot test = {arrive, (Robot::Status)i};
-    if (road[final].poids >= road[test].poids)
+    std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(final);
+    if (got != road.end())
     {
-      final = test;
+      Robot test = {arrive, (Robot::Status)i};
+      if (road[final].poids >= road[test].poids)
+      {
+        final = test;
+      }
     }
   }
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
-  std::vector<int> ret;
-  Case chemin = road[final];
-  Cellule *test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
-  while (!(chemin.parent == start))
+  std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(final);
+  if (got != road.end())
   {
+        //found
+    Case chemin = road[final];
+    Cellule *test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
+    while (!(chemin.parent == start))
+    {
+      for (int i = 0; i < 7; i++)
+      {
+        if (test->tab[i] != nullptr)
+        {
+          if (test->tab[i]->robot == final)
+          {
+            res.push_back(i);
+            final = chemin.parent;
+            chemin = road[final];
+            test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
+            break;
+          }
+        }
+      }
+    }
     for (int i = 0; i < 7; i++)
     {
-      if (test->tab[i]!= nullptr){
-      if( test->tab[i]->robot == final)
+      if (test->tab[i] != nullptr && test->tab[i]->robot == final)
       {
-        std::cout<<final.location.column<<final.location.line<<(int) final.status<<" in ";
-        std::cout << i<<std::endl;
-        ret.push_back(i);
+        res.push_back(i);
+        test = tabCell[final.location.line][final.location.column][(int) final.status];
         final = chemin.parent;
-        chemin = road[final];
-        test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
+        chemin = road[chemin.parent];
         break;
-      }else{
-        std::cout<<final.location.column<<final.location.line<<(int) final.status<<" diff de ";
-        std::cout<<test->tab[i]->robot.location.column<<test->tab[i]->robot.location.line<<(int) test->tab[i]->robot.status<<std::endl;
-      }
       }
     }
   }
-  for (int i = 0; i < 7; i++)
-  {
-    if (test->tab[i]!= nullptr && test->tab[i]->robot == final)
-    {
-      ret.push_back(i);
-      test = tabCell[final.location.line][final.location.column][(int) final.status];
-      final = chemin.parent;
-      chemin = road[chemin.parent];
-      break;
-    }
-  }
-  return ret;
+
 }

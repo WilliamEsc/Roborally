@@ -189,7 +189,7 @@ namespace RR
   return std::hash< std::bitset<16*sizeof(int) + 8*sizeof(Robot::Status)> >()(concat) ;
 }
 
-  Robot::Robot():location(),status(){}
+  Robot::Robot():location({0,0}),status((Robot::Status) 0){}
   Robot::Robot(const Location& loc,const Status& stat):location(loc),status(stat){}
   bool Robot::operator==(const Robot& r2)const{
     return location == r2.location && status==r2.status;
