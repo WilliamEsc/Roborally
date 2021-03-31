@@ -1,5 +1,6 @@
 #include "board.hpp"
 #include "graph.hpp"
+#include "joueurArt.hpp"
 #include <iostream>
 
 int main()
@@ -44,5 +45,14 @@ int main()
   {
     std::cout << "Aucune route possible" << std::endl;
   }
+
+  Graph* g3 = new Graph(b);
+  std::cout<<std::endl<<"joueur artificiel : "<<std::endl;
+  int cartex9[] = {1, 1, 2, 3, 4, 5, 5, 6, 1};
+  end = {1, 0};
+  JoueurArt j(g3, start, end, cartex9, b);
+  j.afficher();
+  delete g3;
+
   return 0;
 }
