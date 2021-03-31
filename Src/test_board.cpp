@@ -1,6 +1,7 @@
 #include "board.hpp"
 #include "graph.hpp"
 #include "joueurArt.hpp"
+#include "automata.cpp"
 #include <iostream>
 
 int main()
@@ -53,6 +54,20 @@ int main()
   JoueurArt j(g3, start, end, cartex9, b);
   j.afficher();
   delete g3;
+
+
+  int carte[9]={0,1,2,1,4,6,6,6,6};
+  automata(g2,start,carte,end);
+  std::cout <<"best "<< std::endl;
+
+  for(long unsigned int i=0;i<res.size();i++){
+    std::cout<<start.move[res[i]]<<std::endl;
+  }
+  std::cout <<"carte "<< std::endl;
+  for (size_t i = 0; i < 9; i++)
+  {
+    std::cout<<start.move[carte[i]]<<std::endl;
+  }
 
   return 0;
 }
