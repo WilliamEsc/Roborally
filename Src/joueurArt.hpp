@@ -9,7 +9,6 @@ class JoueurArt{
     public:
     JoueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b);
     void afficher();
-    int getCarteUsed();
     
     int carteUsed;
     bool arrive;

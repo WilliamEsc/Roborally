@@ -67,6 +67,7 @@ struct Robot {
   Robot();
   Robot(const Location& loc,const Status& stat);
   bool operator==(const Robot& r2)const;
+  Robot& operator=(const Robot& r);
 } ;
 
 struct RobotHash {

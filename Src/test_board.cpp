@@ -48,11 +48,27 @@ int main()
   }
 
   Graph* g3 = new Graph(b);
-  std::cout<<std::endl<<"joueur artificiel : "<<std::endl;
-  int cartex9[] = {1, 1, 2, 3, 4, 5, 5, 6, 1};
-  end = {1, 0};
+  std::cout << std::endl << "//////////////////////////" << std::endl;
+  int cartex9[] = {0,0,2,3,4,6,6,6,6};
+  end = {4, 5};
+  res = g2.dijkstra(start, end);
+  if (res.size() > 0)
+  {
+    std::cout << "dikjstra (à l'envers)" << std::endl;
+    for (int r : res)
+    {
+      std::cout << start.move[r] << std::endl;
+    }
+    std::cout << std::endl;
+  }
+  else
+  {
+    std::cout << "Aucune route possible" << std::endl<<std::endl;
+  }
+  std::cout << std::endl << "IA (à l'endroit): " << std::endl;
   JoueurArt j(g3, start, end, cartex9, b);
   j.afficher();
+  std::cout << std::endl << "//////////////////////////" << std::endl << std::endl;
   delete g3;
 
 

@@ -194,6 +194,12 @@ namespace RR
   bool Robot::operator==(const Robot& r2)const{
     return location == r2.location && status==r2.status;
   }
+  Robot& Robot::operator=(const Robot& r){
+    location.line = r.location.line;
+    location.column = r.location.column;
+    status = r.status;
+    return *this;
+  }
 
   /** Moving **/
 

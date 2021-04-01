@@ -23,9 +23,9 @@ Graph::Graph(Board b) : tabCell(), dead(nullptr)
       Robot::Move::U_TURN};
 
   Robot::Status s[4] = {
-      Robot::Status::WEST,
-      Robot::Status::NORTH,
       Robot::Status::EAST,
+      Robot::Status::NORTH,
+      Robot::Status::WEST,
       Robot::Status::SOUTH};
 
   //initialisation du tableau (les cases)
