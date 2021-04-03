@@ -1,6 +1,6 @@
 #include "board.hpp"
 #include "graph.hpp"
-#include "joueurArt.hpp"
+#include "joueurArt.cpp"
 #include "automata.cpp"
 #include <iostream>
 
@@ -66,8 +66,8 @@ int main()
     std::cout << "Aucune route possible" << std::endl<<std::endl;
   }
   std::cout << std::endl << "IA (à l'endroit): " << std::endl;
-  JoueurArt j(g3, start, end, cartex9, b);
-  j.afficher();
+  int carteUsed =  joueurArt(g3, start, end, cartex9, b);
+  afficherChemin(cartex9, carteUsed);
   std::cout << std::endl << "//////////////////////////" << std::endl << std::endl;
   delete g3;
 

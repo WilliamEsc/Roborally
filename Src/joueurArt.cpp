@@ -1,4 +1,3 @@
-#include "joueurArt.hpp"
 #include "graph.hpp"
 #include <iostream>
 #include <stack>
@@ -45,7 +44,8 @@ void ecraseTab(int cartex9[], int cartex9Best[]){
     for (int i=0; i<9; i++) cartex9Best[i] = cartex9[i];
 }
 
-JoueurArt::JoueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b){
+
+int joueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b){
     Robot::Move tabMoves[7] = {
     Robot::Move::FORWARD_1,
     Robot::Move::FORWARD_2,
@@ -67,13 +67,13 @@ JoueurArt::JoueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::B
     int tailleChem;
     
     int carteUsedTemp = 0;
-    bloque = false;
+    int bloque = false;
     bool bloqueBloque = false;
-    arrive = false;
+    int arrive = false;
 
     int cartex9Best[9]; //LE chemin le plus court
     for (int i=0; i<9; i++) cartex9Best[i] = -1;
-    carteUsed = 0; //nombre de carte utilisées dans LE chemin le plus court
+    int carteUsed = 0; //nombre de carte utilisées dans LE chemin le plus court
     bool arriveTemp = false;
 
     //le robot d'un niveau de la première pile est associé au vector de mouvements possibles du meme niveau de la deuxième pile
@@ -161,16 +161,17 @@ JoueurArt::JoueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::B
         }
     }
     ecraseTab(cartex9Best, cartex9);
-    for (int i=0; i<9; i++) carteAJouer[i] = cartex9[i]; 
+    if (arrive) return carteUsed;
+    return -1;
 }
 
 
-void JoueurArt::afficher(){
-    if(arrive) std::cout<<"arrive"<<std::endl;
+void afficherChemin(int cartex9[], int carteUsed){
+    if(carteUsed >= 0) std::cout<<"arrive"<<std::endl;
     else std::cout<<"pas arrive"<<std::endl;
 
     std::cout<<"nombre de cartes utilisees: "<<carteUsed<<std::endl;
 
     RR::Robot start(RR::Location(0, 0), (RR::Robot::Status)0); //pour avoir accès à la correspondance des mouvements, peut importe les coordonnées
-    for (int i=0; i<carteUsed; i++) std::cout<<start.move[carteAJouer[i]]<<std::endl;
+    for (int i=0; i<carteUsed; i++) std::cout<<start.move[cartex9[i]]<<std::endl;
 }
