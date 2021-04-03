@@ -3,7 +3,7 @@ CXX      = g++ -Wall
 .DEFAULT_GOAL := all
 
 SOURCES = 
-SOURCES += board.cpp graph.cpp joueurArt.cpp
+SOURCES += board.cpp graph.cpp 
 
 OBJECTS = $(SOURCES:.cpp=.o)
 

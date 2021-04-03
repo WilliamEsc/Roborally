@@ -93,10 +93,10 @@ Graph::Graph(Board b) : tabCell(), dead(nullptr)
 
 Cellule *Graph::getRobot(int x, int y, int s, int i)
 {
-  if(i==-1){
-    if(tabCell[x][y].size()==0){
+  if(tabCell[x][y].size()==0){
       return nullptr;
-    }
+  }
+  if(i==-1){
     return tabCell[x][y][s];
   }
   return tabCell[x][y][s]->tab[i];

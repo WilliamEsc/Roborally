@@ -38,7 +38,6 @@ public:
   Cellule* getRobot(int x,int y,int s,int i);
 
   /* construction par copie */
-  Graph(const Graph &autre);
 
   /* affectation */
   Graph &operator=(const Graph &autre);

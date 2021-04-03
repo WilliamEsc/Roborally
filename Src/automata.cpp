@@ -48,7 +48,7 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
     {
         int nbBon = contain(carte, res, 0);
         //std::cout << "nbBon :" << nbBon << std::endl;
-        if ( nbBon < 5 && (nbBon != (int) res.size()) ) // carte contient la solution de res
+        if (nbBon < 5 && (nbBon != (int)res.size())) // carte contient la solution de res
         {
             for (int i = 0; i < nbBon; i++)
             {
@@ -106,5 +106,72 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
                 nbBon = contain(carte, bestVec, nbBon);
             }
         }
-    } 
+    }
+}
+
+void testSpeady(Graph& g, Board& b)
+{
+    int carte[9];
+    int nbDead=0;
+    int nbFini=0;
+    while (true)
+    {
+        //std::cout << std::endl<< " DEBUT " << std::endl;
+        Cellule *deb = nullptr;
+        while (deb == nullptr || deb->robot.status == RR::Robot::Status::DEAD)
+        {
+            int x = rand() % 24;
+            int y = rand() % 11;
+            int s = rand() % 4;
+            deb = g.getRobot(x, y, s, -1);
+        }
+        Cellule *end = nullptr;
+        while (end == nullptr || end->robot.status == RR::Robot::Status::DEAD)
+        {
+            int x = rand() % 24;
+            int y = rand() % 11;
+            int s = rand() % 4;
+            end = g.getRobot(x, y, s, -1);
+        }
+        RR::Robot speady = deb->robot;
+        //std::cout << "SPEADY " << speady.location.line<<" " << speady.location.column<<" " << (int)speady.status << std::endl;
+        //std::cout << "END " << end->robot.location.line<<" " << end->robot.location.column << std::endl;
+        std::vector<int> chemin = g.dijkstra(speady, end->robot.location);
+        if (chemin.size() > 0)
+        {
+            while (!(speady.location == end->robot.location) && speady.status != RR::Robot::Status::DEAD)
+            {
+                //std::cout << "tirage " << std::endl;
+                for (int i = 0; i < 9; i++)
+                {
+                    carte[i] = rand() % 7;
+                    //std::cout << speady.move[carte[i]] << " ";
+                }
+
+                //std::cout << std::endl<< "calcul " << std::endl;
+                automata(g, speady, carte, end->robot.location);
+                for (size_t k = 0; k < 5; k++)
+                {
+                    if (!(speady.location == end->robot.location))
+                    {
+                        //std::cout << k << " " << speady.move[carte[k]] << std::endl;
+                        b.play(speady, (RR::Robot::Move)carte[k]);
+                    }
+                }
+                //std::cout << "pos " << speady.location.line << speady.location.column << (int)speady.status << std::endl;
+                //std::cout << "fin calcul " << std::endl;
+            }
+            if (speady.status == RR::Robot::Status::DEAD)
+            {
+                //std::cout << " DEAD " << std::endl;
+                nbDead++;
+            }
+            else
+            {
+                //std::cout << " FINI " << std::endl;
+                nbFini++;
+            }
+            std::cout<<nbFini << " vs " << nbDead<<std::endl;
+        }
+    }
 }
