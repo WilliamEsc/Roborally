@@ -23,9 +23,9 @@ Graph::Graph(Board b) : tabCell(), dead(nullptr)
       Robot::Move::U_TURN};
 
   Robot::Status s[4] = {
-      Robot::Status::WEST,
-      Robot::Status::NORTH,
       Robot::Status::EAST,
+      Robot::Status::NORTH,
+      Robot::Status::WEST,
       Robot::Status::SOUTH};
 
   //initialisation du tableau (les cases)
@@ -93,6 +93,12 @@ Graph::Graph(Board b) : tabCell(), dead(nullptr)
 
 Cellule *Graph::getRobot(int x, int y, int s, int i)
 {
+  if(i==-1){
+    if(tabCell[x][y].size()==0){
+      return nullptr;
+    }
+    return tabCell[x][y][s];
+  }
   return tabCell[x][y][s]->tab[i];
 }
 
@@ -230,7 +236,6 @@ Case::Case() : parent(), poids(-1) {}
 
 std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
 {
-  //std::cout << "start ";
   std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
   Case st(start, 0);
   road[start] = st;
@@ -286,8 +291,8 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
   }
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
-  got = road.find(final);
-  std::vector<int> res;
+  std::vector<int> envers;
+  std::vector<int> endroit;
   if (got != road.end())
   {
     //found
@@ -295,13 +300,14 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
     Cellule *test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
     while (!(chemin.parent == start))
     {
+      //on cherche quel mouvement amene a la case suivante
       for (int i = 0; i < 7; i++)
       {
         if (test->tab[i] != nullptr)
         {
           if (test->tab[i]->robot == final)
           {
-            res.push_back(i);
+            envers.push_back(i);
             final = chemin.parent;
             chemin = road[final];
             test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
@@ -310,11 +316,14 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
         }
       }
     }
+
+    //push du point start dans le résultat
+    //on cherche quel mouvement amene a la 2eme case
     for (int i = 0; i < 7; i++)
     {
       if (test->tab[i] != nullptr && test->tab[i]->robot == final)
       {
-        res.push_back(i);
+        envers.push_back(i);
         test = tabCell[final.location.line][final.location.column][(int) final.status];
         final = chemin.parent;
         chemin = road[chemin.parent];
@@ -322,12 +331,17 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
       }
     }
   }
-  return res;
+
+  for (int i = envers.size()-1; i >=0; i--)
+  {
+    endroit.push_back(envers[i]);
+  }
+  
+  return endroit;
 }
 
-std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int permis[9])
+std::vector<int> Graph::dijkstraBonSens(const Robot &start, const Location &arrive)
 {
-  //std::cout << "start ";
   std::unordered_map<Robot, Case, RobotHash> road; //Robot -> parent,poids
   Case st(start, 0);
   road[start] = st;
@@ -339,37 +353,27 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int
     Case temp = s.pop(); //Attention ici temp est issue du tas donc parent est le robot en lui meme avec son poids
     for (int x = 0; x < 7; x++)
     {
-      bool allow = false;
-      for (size_t i = 0; i < 9; i++)
+      Cellule *r = tabCell[temp.parent.location.line][temp.parent.location.column][(int)temp.parent.status]->tab[x];
+      if (r != nullptr && r->robot.status != Robot::Status::DEAD)
       {
-        /* contenue dans les mouvement permis */
-        if (x == permis[i])
-          allow = true;
-      }
-      if (allow)
-      {
-        Cellule *r = tabCell[temp.parent.location.line][temp.parent.location.column][(int)temp.parent.status]->tab[x];
-        if (r != nullptr && r->robot.status != Robot::Status::DEAD)
+        int dw;
+        std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(r->robot);
+        if (got == road.end())
         {
-          int dw;
-          std::unordered_map<Robot, Case, RobotHash>::const_iterator got = road.find(r->robot);
-          if (got == road.end())
-          {
-            //not found
-            dw = -1;
-          }
-          else
-          {
-            //found
-            dw = road.at(r->robot).poids;
-          }
-          if ((dw == -1) || (dw > temp.poids + 1))
-          {
-            //std::cout << "in-" << temp.poids;
-            Case maj(temp.parent, temp.poids + 1);
-            road[r->robot] = maj;
-            s.insert_modify({r->robot, temp.poids + 1});
-          }
+          //not found
+          dw = -1;
+        }
+        else
+        {
+          //found
+          dw = road.at(r->robot).poids;
+        }
+        if ((dw == -1) || (dw > temp.poids + 1))
+        {
+          //std::cout << "in-" << temp.poids;
+          Case maj(temp.parent, temp.poids + 1);
+          road[r->robot] = maj;
+          s.insert_modify({r->robot, temp.poids + 1});
         }
       }
     }
@@ -393,8 +397,8 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int
   }
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
-  got = road.find(final);
-  std::vector<int> res;
+  std::vector<int> envers;
+  std::vector<int> endroit;
   if (got != road.end())
   {
     //found
@@ -402,13 +406,14 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int
     Cellule *test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
     while (!(chemin.parent == start))
     {
+      //on cherche quel mouvement amene a la case suivante
       for (int i = 0; i < 7; i++)
       {
         if (test->tab[i] != nullptr)
         {
           if (test->tab[i]->robot == final)
           {
-            res.push_back(i);
+            envers.push_back(i);
             final = chemin.parent;
             chemin = road[final];
             test = tabCell[chemin.parent.location.line][chemin.parent.location.column][(int)chemin.parent.status];
@@ -417,11 +422,14 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int
         }
       }
     }
+
+    //push du point start dans le résultat
+    //on cherche quel mouvement amene a la 2eme case
     for (int i = 0; i < 7; i++)
     {
       if (test->tab[i] != nullptr && test->tab[i]->robot == final)
       {
-        res.push_back(i);
+        envers.push_back(i);
         test = tabCell[final.location.line][final.location.column][(int) final.status];
         final = chemin.parent;
         chemin = road[chemin.parent];
@@ -429,5 +437,11 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive, int
       }
     }
   }
-  return res;
+
+  for (int i = envers.size()-1; i >=0; i--)
+  {
+    endroit.push_back(envers[i]);
+  }
+  
+  return endroit;
 }

@@ -5,114 +5,106 @@
 
 const int MAIN = 9;
 
-bool contain(int contener[MAIN], std::vector<int> content)
+int contain(int contener[MAIN], std::vector<int> content, int nbBon)
 {
-    int copy[MAIN];
-    bool find;
-    for (long unsigned int i = 0; i < MAIN; i++)
-    {
-        /* code */
-        copy[i] = contener[i];
-    }
+    int nbfind = nbBon;
     for (long unsigned int i = 0; i < content.size(); i++)
     {
-        find = false;
-        for (long unsigned int j = 0; j < MAIN; j++)
+        bool find = false;
+        for (long unsigned int j = i + nbBon; j < MAIN; j++)
         {
-            if (copy[j] == content[i] && !find)
+            if (contener[j] == content[i])
             { //réarrange la 1ere carte correspondant
-                copy[j] = 9;
+                int tmp = contener[nbfind];
+                contener[nbfind] = contener[j];
+                contener[j] = tmp;
+                nbfind++;
                 find = true;
+                break;
             }
         }
-        if (!find)
+        if (!find || nbfind == 5)
         {
-            return find;
+            return nbfind;
         }
     }
-    return find;
+    return nbfind;
 }
 
-bool contain(std::vector<int> contener, std::vector<int> content)
+void affiche(std::vector<int> content, RR::Robot twoB)
 {
-    int copy[MAIN];
-    bool find;
-    for (size_t i = 0; i < MAIN; i++)
+    std::cout << "pos " << twoB.location.line << twoB.location.column << (int)twoB.status << std::endl;
+    for (size_t i = 0; i < content.size(); i++)
     {
-        /* code */
-        copy[i] = contener[i];
+        std::cout << twoB.move[content[i]] << std::endl;
     }
-
-    for (long unsigned int i = 0; i < content.size(); i++)
-    {
-        find = false;
-        for (long unsigned int j = i; j < MAIN; j++)
-        {
-            if (copy[j] == content[i] && !find)
-            { //réarrange la 1ere carte correspondant
-                copy[j] = 9;
-                find = true;
-            }
-        }
-        if (!find)
-        {
-            return find;
-        }
-    }
-    return find;
 }
 
 void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
 {
-    std::vector<int> res = g.dijkstra(twoB, end);
+    //std::cout << "pos " << twoB.location.line << twoB.location.column << (int)twoB.status << std::endl;
+    std::vector<int> res = g.dijkstraBonSens(twoB, end);
     if (res.size() > 0)
     {
-        if (!contain(carte, res)) // carte contient la solution de res
+        int nbBon = contain(carte, res, 0);
+        //std::cout << "nbBon :" << nbBon << std::endl;
+        if ( nbBon < 5 && (nbBon != (int) res.size()) ) // carte contient la solution de res
         {
-            std::vector<int> best(0); //pour choisir la meilleure option
-            for (size_t i = 0; i < MAIN; i++)
+            for (int i = 0; i < nbBon; i++)
             {
-                Cellule *rob = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, carte[i]);
-                if (rob != nullptr)
+                twoB = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, carte[i])->robot;
+                //std::cout << "debut " << i << " " << twoB.move[carte[i]] << std::endl;
+            }
+
+            for (size_t n = nbBon; n < 5; n++)
+            {
+                int bestnb = -1;
+                int bestI = -1;
+                std::vector<int> bestVec;
+                for (int i = nbBon; i < MAIN; i++)
                 {
-                    std::vector<int> test = g.dijkstra(rob->robot, end,carte);
-                    int copy[9];
-                    for (size_t k = 0; k < MAIN; k++)
+                    int save = carte[i];
+                    carte[i] = carte[nbBon];
+                    carte[nbBon] = save;
+                    //std::cout << "pos " << i << " " << nbBon << " " << twoB.location.line << twoB.location.column << (int)twoB.status << twoB.move[save] << std::endl;
+                    nbBon++;
+                    Cellule *rob = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, save);
+                    if (rob != nullptr)
                     {
-                        /* code */
-                        if (k != i)
-                            copy[k] = carte[k];
-                        else
-                            copy[k] = 9;
-                    }
-                    if (test.size() > 0 && contain(copy, test))
-                    {
-                        if (best.size() == 0 || best.size() > test.size() + 1)
+                        std::vector<int> test = g.dijkstraBonSens(rob->robot, end);
+
+                        int tmp = contain(carte, test, nbBon);
+
+                        if (tmp >= 4)
                         {
-                            best = test;
-                            best.push_back(carte[i]);
+                            //std::cout << "2 " << twoB.move[save] << std::endl;
+                            //affiche(test, rob->robot);
+                            //nbBon = 5;
+                            return;
+                        }
+                        else if (tmp > bestnb)
+                        {
+                            //std::cout << "best :" << tmp << " " << twoB.move[save] << std::endl;
+                            bestnb = tmp;
+                            bestI = save;
+                            bestVec = test;
                         }
                     }
+                    nbBon--;
                 }
-            }
-            for (size_t i = 0; i < best.size(); i++)
-            {
-                /* code */
-                std::cout << twoB.move[best[i]] << std::endl;
-            }
-            res = best;
-        }
-        for (long unsigned int i = 0; i < res.size(); i++)
-        {
-            for (long unsigned int j = i; j < MAIN; j++)
-            {
-                if (carte[j] == res[i])
-                { //réarrange la 1ere carte correspondant
-                    int temp = carte[i];
-                    carte[i] = carte[j];
-                    carte[j] = temp;
+                //std::cout << "end :" << n << std::endl;
+                for (size_t i = nbBon; i < 9; i++)
+                {
+                    if (carte[i] == bestI)
+                    {
+                        int save = carte[i];
+                        carte[i] = carte[nbBon];
+                        carte[nbBon] = save;
+                        nbBon++;
+                    }
                 }
+                nbBon = contain(carte, bestVec, nbBon);
             }
         }
-    }
+    } 
 }

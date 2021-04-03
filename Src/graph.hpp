@@ -34,7 +34,7 @@ public:
   Graph( Board b);
 
   std::vector<int> dijkstra(const Robot& start,const Location& arrive);
-  std::vector<int> dijkstra(const Robot &start, const Location &arrive,int permis[9]);
+  std::vector<int> dijkstraBonSens(const Robot &start, const Location &arrive);
   Cellule* getRobot(int x,int y,int s,int i);
 
   /* construction par copie */
