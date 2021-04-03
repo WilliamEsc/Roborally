@@ -44,7 +44,26 @@ void ecraseTab(int cartex9[], int cartex9Best[]){
     for (int i=0; i<9; i++) cartex9Best[i] = cartex9[i];
 }
 
+//remplit le tableau de cartes de manière aléatoirement en tenant compte de leur rareté dans le jeu original
+void tirageCartes(int cartex9[]){
+    int cartes[84];
+    for (int i = 0; i<6; i++) cartes[i] = 6; //6 U_TURN (6)
+    for (int i = 6; i<24; i++) cartes[i] = 4; //18 TURN_LEFT (4)
+    for (int i = 24; i<42; i++) cartes[i] = 5; //18 TURN_RIGHT (5)
+    for (int i = 42; i<48; i++) cartes[i] = 3; //6 BACKWARD_1 (3)
+    for (int i = 48; i<66; i++) cartes[i] = 0; //18 FORWARD_1 (0)
+    for (int i = 66; i<78; i++) cartes[i] = 1; //12 FORWARD_2 (1)
+    for (int i = 78; i<84; i++) cartes[i] = 2; //6 FORWARD_3 (2)
 
+    for(int i=0; i<9; i++){
+        int n = rand()%(84-i); 
+        cartex9[i] = cartes[n];
+        cartes[n] = cartes[84-1-i]; //cartes[i] prend la dernière case
+    }
+}
+
+//retourne soit le nombre de cartes (mouvements) nécessaires pour arriver à destination,
+//soit -1 si il n'y a pas de chemins possibles
 int joueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b){
     Robot::Move tabMoves[7] = {
     Robot::Move::FORWARD_1,
@@ -80,6 +99,8 @@ int joueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b)
         //du coup les 2 piles ont forcément la même taille
     std::stack<RR::Robot> pileRobot;
     std::stack<std::vector<int>> pileActionsPossibles;
+
+    if(ret.size() == 0) return 0;
     
     while(!bloqueBloque){
         mouv = ret.back(); //prochain mouvement à faire selon le chemin le plus court actuel
@@ -167,11 +188,76 @@ int joueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b)
 
 
 void afficherChemin(int cartex9[], int carteUsed){
-    if(carteUsed >= 0) std::cout<<"arrive"<<std::endl;
-    else std::cout<<"pas arrive"<<std::endl;
+    RR::Robot start(RR::Location(0, 0), (RR::Robot::Status)0); //pour avoir accès à la correspondance des mouvements, peut importe les coordonnées
 
-    std::cout<<"nombre de cartes utilisees: "<<carteUsed<<std::endl;
+    std::cout << std::endl << "IA (à l'endroit): " << std::endl;
+    std::cout << "jeu de cartes : (";
+    for (int i=0; i<9; i++) std::cout<<start.move[cartex9[i]]<<" ";
+    std::cout<<")"<<std::endl;
+    if(carteUsed >= 0) std::cout << "arrivé avec " << carteUsed << " cartes  "<< std::endl;
+    else {
+        std::cout << "pas possible d'arriver avec les cartes fournies, on peut se rapprocher avec:" << std::endl;
+        carteUsed = 5; //on regarde les 5 premières pour voir ou on peut avancer
+    }
+    
+
+    for (int i=0; i<carteUsed; i++) std::cout << start.move[cartex9[i]] << std::endl;
+    std::cout<<std::endl;
+}
+
+void afficherChemin(std::vector<int> res){
+    std::cout << "dikjstra (à l'envers)" << std::endl;
+    if(res.size() > 0) std::cout << "arrivé avec "<<res.size() << " cartes  " << std::endl;
+    else {
+        //res.size() == 0
+        std::cout << "pas de mouvements nécessaires" << std::endl;
+        return;
+    }
 
     RR::Robot start(RR::Location(0, 0), (RR::Robot::Status)0); //pour avoir accès à la correspondance des mouvements, peut importe les coordonnées
-    for (int i=0; i<carteUsed; i++) std::cout<<start.move[cartex9[i]]<<std::endl;
+    for (int r : res) std::cout << start.move[r] << std::endl;
+        
+    //for (int i=0; i<(int)res.size(); i++) std::cout<<start.move[res[i]]<<std::endl;
+}
+
+void testJoueurArt(RR::Board b){
+    Graph* g3 = new Graph(b);
+    Graph g2(b);
+    RR::Location end;
+    std::vector<int> res;
+    int carteUsed; //nombre de cartes (de mouvements) utilisés
+
+    std::cout << std::endl << "//////////////////////////" << std::endl;
+    RR::Robot start(RR::Location(0, 1), (RR::Robot::Status)3);
+    int cartex9[] = {0,0,2,3,4,6,6,6,6};
+    
+    std::cout << "test chemin (0, 1) -> (0, 1)" << std::endl;
+    end = {0, 1};
+    res = g2.dijkstra(start, end);
+    afficherChemin(res);
+    carteUsed = joueurArt(g3, start, end, cartex9, b);
+    afficherChemin(cartex9, carteUsed);
+
+    /*std::cout << "test chemin (0, 1) -> (1, 0)" << std::endl;
+    end = {1, 0};
+    res = g2.dijkstra(start, end);
+    afficherChemin(res);
+    carteUsed = joueurArt(g3, start, end, cartex9, b);
+    afficherChemin(cartex9, carteUsed);*/
+
+    std::cout << "test chemin (0, 1) -> (4, 5)" << std::endl;
+    end = {4, 5};
+    res = g2.dijkstra(start, end);
+    afficherChemin(res);
+    carteUsed = joueurArt(g3, start, end, cartex9, b);
+    afficherChemin(cartex9, carteUsed);
+   
+    std::cout << std::endl << "//////////////////////////" << std::endl;
+    std::cout << "avec cartes au hasard :" << std::endl;
+    end = {1, 0};
+    tirageCartes(cartex9); //pour avoir 9 cartes au hasard
+    carteUsed = joueurArt(g3, start, end, cartex9, b);
+    afficherChemin(cartex9, carteUsed);
+    delete g3;
+    std::cout << "//////////////////////////" << std::endl;
 }

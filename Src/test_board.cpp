@@ -8,6 +8,7 @@ int main()
 {
   RR::Board b("board.txt");
   b.save("/tmp/cpy.txt");
+  srand(time(NULL));
 
   //RR::Graph g(2, 2, "board.txt");
   //g.afficher();
@@ -47,29 +48,7 @@ int main()
     std::cout << "Aucune route possible" << std::endl;
   }
 
-  Graph* g3 = new Graph(b);
-  std::cout << std::endl << "//////////////////////////" << std::endl;
-  int cartex9[] = {0,0,2,3,4,6,6,6,6};
-  end = {4, 5};
-  res = g2.dijkstra(start, end);
-  if (res.size() > 0)
-  {
-    std::cout << "dikjstra (à l'envers)" << std::endl;
-    for (int r : res)
-    {
-      std::cout << start.move[r] << std::endl;
-    }
-    std::cout << std::endl;
-  }
-  else
-  {
-    std::cout << "Aucune route possible" << std::endl<<std::endl;
-  }
-  std::cout << std::endl << "IA (à l'endroit): " << std::endl;
-  int carteUsed =  joueurArt(g3, start, end, cartex9, b);
-  afficherChemin(cartex9, carteUsed);
-  std::cout << std::endl << "//////////////////////////" << std::endl << std::endl;
-  delete g3;
+  testJoueurArt(b);
 
 
   int carte[9]={0,1,2,1,4,6,6,6,6};
@@ -84,6 +63,7 @@ int main()
   {
     std::cout<<start.move[carte[i]]<<std::endl;
   }
+
 
   return 0;
 }
