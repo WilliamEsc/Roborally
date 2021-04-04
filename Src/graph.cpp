@@ -93,7 +93,7 @@ Graph::Graph(Board b) : tabCell(), dead(nullptr)
 
 Cellule *Graph::getRobot(int x, int y, int s, int i)
 {
-  if(tabCell[x][y].size()==0){
+  if(tabCell[x][y].empty()){
       return nullptr;
   }
   if(i==-1){
@@ -292,7 +292,6 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
 
   //push des parents de chaque position du chemin entre le robot final et le robot d'arrivée
   std::vector<int> envers;
-  std::vector<int> endroit;
   if (got != road.end())
   {
     //found
@@ -331,13 +330,8 @@ std::vector<int> Graph::dijkstra(const Robot &start, const Location &arrive)
       }
     }
   }
-
-  for (int i = envers.size()-1; i >=0; i--)
-  {
-    endroit.push_back(envers[i]);
-  }
   
-  return endroit;
+  return envers;
 }
 
 std::vector<int> Graph::dijkstraBonSens(const Robot &start, const Location &arrive)

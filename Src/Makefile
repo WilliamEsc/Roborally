@@ -14,7 +14,7 @@ $(OBJECTS) : %.o : %.cpp
 	$(CXX) -MMD $(CXXFLAGS) -c $< -o $@
 
 CLEAN_OBJECTS = $(OBJECTS)
-TARGETS = 
+TARGETS =
 
 ########## test_board ##########
 

@@ -55,7 +55,6 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
                 twoB = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, carte[i])->robot;
                 //std::cout << "debut " << i << " " << twoB.move[carte[i]] << std::endl;
             }
-
             for (size_t n = nbBon; n < 5; n++)
             {
                 int bestnb = -1;
@@ -69,13 +68,14 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
                     //std::cout << "pos " << i << " " << nbBon << " " << twoB.location.line << twoB.location.column << (int)twoB.status << twoB.move[save] << std::endl;
                     nbBon++;
                     Cellule *rob = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, save);
-                    if (rob != nullptr)
+                    if (rob != nullptr && rob->robot.status!=RR::Robot::Status::DEAD)
                     {
                         std::vector<int> test = g.dijkstraBonSens(rob->robot, end);
 
                         int tmp = contain(carte, test, nbBon);
 
-                        if (tmp >= 4)
+
+                        if (tmp >= 5 && nbBon!=5)
                         {
                             //std::cout << "2 " << twoB.move[save] << std::endl;
                             //affiche(test, rob->robot);
@@ -100,10 +100,19 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
                         int save = carte[i];
                         carte[i] = carte[nbBon];
                         carte[nbBon] = save;
+                        twoB = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, save)->robot;
                         nbBon++;
+                        break;
                     }
                 }
-                nbBon = contain(carte, bestVec, nbBon);
+                int nb=contain(carte, bestVec, nbBon);
+                for (int i = 0; i < nb-nbBon; i++)
+                {
+                    
+                    twoB = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, bestVec[i])->robot;
+
+                }
+                nbBon = nb;
             }
         }
     }
@@ -114,19 +123,21 @@ void testSpeady(Graph& g, Board& b)
     int carte[9];
     int nbDead=0;
     int nbFini=0;
-    while (true)
+    int nbTours=0;
+    int nbTrajet=0;
+    while (nbTrajet<100)
     {
         //std::cout << std::endl<< " DEBUT " << std::endl;
         Cellule *deb = nullptr;
-        while (deb == nullptr || deb->robot.status == RR::Robot::Status::DEAD)
+         while (deb == nullptr || deb->robot.status == RR::Robot::Status::DEAD)
         {
             int x = rand() % 24;
             int y = rand() % 11;
             int s = rand() % 4;
             deb = g.getRobot(x, y, s, -1);
         }
-        Cellule *end = nullptr;
-        while (end == nullptr || end->robot.status == RR::Robot::Status::DEAD)
+         Cellule *end = nullptr;
+         while (end == nullptr || end->robot.status == RR::Robot::Status::DEAD)
         {
             int x = rand() % 24;
             int y = rand() % 11;
@@ -137,7 +148,7 @@ void testSpeady(Graph& g, Board& b)
         //std::cout << "SPEADY " << speady.location.line<<" " << speady.location.column<<" " << (int)speady.status << std::endl;
         //std::cout << "END " << end->robot.location.line<<" " << end->robot.location.column << std::endl;
         std::vector<int> chemin = g.dijkstra(speady, end->robot.location);
-        if (chemin.size() > 0)
+        if (chemin.size()>0)
         {
             while (!(speady.location == end->robot.location) && speady.status != RR::Robot::Status::DEAD)
             {
@@ -158,6 +169,7 @@ void testSpeady(Graph& g, Board& b)
                         b.play(speady, (RR::Robot::Move)carte[k]);
                     }
                 }
+                nbTours++;
                 //std::cout << "pos " << speady.location.line << speady.location.column << (int)speady.status << std::endl;
                 //std::cout << "fin calcul " << std::endl;
             }
@@ -171,7 +183,8 @@ void testSpeady(Graph& g, Board& b)
                 //std::cout << " FINI " << std::endl;
                 nbFini++;
             }
-            std::cout<<nbFini << " vs " << nbDead<<std::endl;
+            nbTrajet++;
         }
     }
+    std::cout<<nbFini << " vs " << nbDead<<std::endl;
 }
