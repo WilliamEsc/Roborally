@@ -25,8 +25,8 @@ int main()
   RR::Robot start(RR::Location(0, 1), (RR::Robot::Status)3);
   RR::Location end = {1, 0};
   std::vector<int> res;
-  res = g.dijkstra(start, end);
-  std::cout << std::endl;
+  std::cout << "Dijkstra (0, 1) -> (1, 0), petit plateau :" << std::endl;
+  res = g.dijkstraBonSens(start, end);
   if (res.size() > 0)
   {
     for (int r : res)
@@ -39,7 +39,9 @@ int main()
     std::cout << "Aucune route possible" << std::endl;
   }
 
+  std::cout << std::endl << "testSpeady, 100 manches : " << std::endl;
   testSpeady(gbig,big);
+  std::cout << std::endl << "testJoueurArt, 5 manches : " << std::endl;
   testJoueurArt(big);
 
 

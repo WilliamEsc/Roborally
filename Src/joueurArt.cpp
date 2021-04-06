@@ -190,7 +190,7 @@ int joueurArt(Graph *g, Robot rob, RR::Location end, int cartex9[], RR::Board b)
 void afficherChemin(int cartex9[], int carteUsed){
     RR::Robot start(RR::Location(0, 0), (RR::Robot::Status)0); //pour avoir accès à la correspondance des mouvements, peut importe les coordonnées
 
-    std::cout << std::endl << "IA (à l'endroit): " << std::endl;
+    std::cout << "IA" << std::endl;
     std::cout << "jeu de cartes : (";
     for (int i=0; i<9; i++) std::cout<<start.move[cartex9[i]]<<" ";
     std::cout<<")"<<std::endl;
@@ -203,21 +203,6 @@ void afficherChemin(int cartex9[], int carteUsed){
 
     for (int i=0; i<carteUsed; i++) std::cout << start.move[cartex9[i]] << std::endl;
     std::cout<<std::endl;
-}
-
-void afficherChemin(std::vector<int> res){
-    std::cout << "dikjstra (à l'envers)" << std::endl;
-    if(res.size() > 0) std::cout << "arrivé avec "<<res.size() << " cartes  " << std::endl;
-    else {
-        //res.size() == 0
-        std::cout << "pas de mouvements nécessaires" << std::endl;
-        return;
-    }
-
-    RR::Robot start(RR::Location(0, 0), (RR::Robot::Status)0); //pour avoir accès à la correspondance des mouvements, peut importe les coordonnées
-    for (int r : res) std::cout << start.move[r] << std::endl;
-        
-    //for (int i=0; i<(int)res.size(); i++) std::cout<<start.move[res[i]]<<std::endl;
 }
 
 void testJoueurArt(RR::Board b){
@@ -257,11 +242,7 @@ void testJoueurArt(RR::Board b){
             while (!(speady.location == end->robot.location) && speady.status != RR::Robot::Status::DEAD)
             {
                 //std::cout << "tirage " << std::endl;
-                for (int i = 0; i < 9; i++)
-                {
-                    carte[i] = rand() % 7;
-                    //std::cout << speady.move[carte[i]] << " ";
-                }
+                tirageCartes(carte);
 
                 //std::cout << std::endl<< "calcul " << std::endl;
                 //joueurArt(g, speady, carte, end->robot.location);
