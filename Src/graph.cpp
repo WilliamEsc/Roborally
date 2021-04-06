@@ -432,10 +432,12 @@ std::vector<int> Graph::dijkstraBonSens(const Robot &start, const Location &arri
     }
   }
 
-  for (int i = envers.size()-1; i >=0; i--)
+  for (long unsigned int i = 0; i < envers.size()/2; i++)
   {
-    endroit.push_back(envers[i]);
+    int tmp = envers[i];
+    envers[i]=envers[envers.size()-1-i];
+    envers[envers.size()-1-i]=tmp;
   }
   
-  return endroit;
+  return envers;
 }

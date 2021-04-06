@@ -48,7 +48,7 @@ int main()
             if(player1.status != Robot::Status::DEAD)
                 automata(g, player1, cards1, target.location);
             if(player2.status != Robot::Status::DEAD)
-                automata(g, player2, cards2, target.location);
+                joueurArt(&g, player1,target.location, cards2,b);
             //best_play(b, g, source, target.location, cards);
 
             for (int i = 0; i < 5; ++i)
@@ -59,8 +59,8 @@ int main()
                     b.play(player2,(RR::Robot::Move) cards2[i]);
             }
         }
-        std::cout << "fin de la manche n*" << i << "nb_tours = " << tours1 << std::endl;
-        std::cout << "fin de la manche n*" << i << "nb_tours = " << tours2 << std::endl;
+        std::cout << "fin de la manche player1 n*" << i << "nb_tours = " << tours1 << std::endl;
+        std::cout << "fin de la manche player2 n*" << i << "nb_tours = " << tours2 << std::endl;
         if(tours1 < tours2){
             victoire1++;
         } else if(tours2 < tours1){
@@ -68,6 +68,8 @@ int main()
         }else{
             draw++;
         }
+        total1+=tours1;
+        total2+=tours2;
     }
     std::cout << "FIN DU TEST" << std::endl;
     double nb_tours_moyen1 = (double) total1 / 100;
