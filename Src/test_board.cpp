@@ -40,7 +40,7 @@ int main()
   }
 
   testSpeady(gbig,big);
-  testJoueurArt(b);
+  testJoueurArt(big);
 
 
   return 0;

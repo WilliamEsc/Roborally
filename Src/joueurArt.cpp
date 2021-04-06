@@ -221,43 +221,75 @@ void afficherChemin(std::vector<int> res){
 }
 
 void testJoueurArt(RR::Board b){
-    Graph* g3 = new Graph(b);
+    Graph* g = new Graph(b);
     Graph g2(b);
-    RR::Location end;
-    std::vector<int> res;
-    int carteUsed; //nombre de cartes (de mouvements) utilisés
 
-    std::cout << std::endl << "//////////////////////////" << std::endl;
-    RR::Robot start(RR::Location(0, 1), (RR::Robot::Status)3);
-    int cartex9[] = {0,0,2,3,4,6,6,6,6};
-    
-    std::cout << "test chemin (0, 1) -> (0, 1)" << std::endl;
-    end = {0, 1};
-    res = g2.dijkstra(start, end);
-    afficherChemin(res);
-    carteUsed = joueurArt(g3, start, end, cartex9, b);
-    afficherChemin(cartex9, carteUsed);
+    int carte[9];
+    int nbDead=0;
+    int nbFini=0;
+    int nbTours=0;
+    int nbTrajet=0;
+    while (nbTrajet<5)
+    {
+        //std::cout << std::endl<< " DEBUT " << std::endl;
+        Cellule *deb = nullptr;
+         while (deb == nullptr || deb->robot.status == RR::Robot::Status::DEAD)
+        {
+            int x = rand() % 24;
+            int y = rand() % 11;
+            int s = rand() % 4;
+            deb = g2.getRobot(x, y, s, -1);
+        }
+         Cellule *end = nullptr;
+         while (end == nullptr || end->robot.status == RR::Robot::Status::DEAD)
+        {
+            int x = rand() % 24;
+            int y = rand() % 11;
+            int s = rand() % 4;
+            end = g2.getRobot(x, y, s, -1);
+        }
+        RR::Robot speady = deb->robot;
+        //std::cout << "SPEADY " << speady.location.line<<" " << speady.location.column<<" " << (int)speady.status << std::endl;
+        //std::cout << "END " << end->robot.location.line<<" " << end->robot.location.column << std::endl;
+        std::vector<int> chemin = g2.dijkstra(speady, end->robot.location);
+        if (chemin.size()>0)
+        {
+            while (!(speady.location == end->robot.location) && speady.status != RR::Robot::Status::DEAD)
+            {
+                //std::cout << "tirage " << std::endl;
+                for (int i = 0; i < 9; i++)
+                {
+                    carte[i] = rand() % 7;
+                    //std::cout << speady.move[carte[i]] << " ";
+                }
 
-    /*std::cout << "test chemin (0, 1) -> (1, 0)" << std::endl;
-    end = {1, 0};
-    res = g2.dijkstra(start, end);
-    afficherChemin(res);
-    carteUsed = joueurArt(g3, start, end, cartex9, b);
-    afficherChemin(cartex9, carteUsed);*/
-
-    std::cout << "test chemin (0, 1) -> (4, 5)" << std::endl;
-    end = {4, 5};
-    res = g2.dijkstra(start, end);
-    afficherChemin(res);
-    carteUsed = joueurArt(g3, start, end, cartex9, b);
-    afficherChemin(cartex9, carteUsed);
-   
-    std::cout << std::endl << "//////////////////////////" << std::endl;
-    std::cout << "avec cartes au hasard :" << std::endl;
-    end = {1, 0};
-    tirageCartes(cartex9); //pour avoir 9 cartes au hasard
-    carteUsed = joueurArt(g3, start, end, cartex9, b);
-    afficherChemin(cartex9, carteUsed);
-    delete g3;
-    std::cout << "//////////////////////////" << std::endl;
+                //std::cout << std::endl<< "calcul " << std::endl;
+                //joueurArt(g, speady, carte, end->robot.location);
+                joueurArt(g, speady, end->robot.location, carte, b);
+                for (size_t k = 0; k < 5; k++)
+                {
+                    if (!(speady.location == end->robot.location))
+                    {
+                        //std::cout << k << " " << speady.move[carte[k]] << std::endl;
+                        b.play(speady, (RR::Robot::Move)carte[k]);
+                    }
+                }
+                nbTours++;
+                //std::cout << "pos " << speady.location.line << speady.location.column << (int)speady.status << std::endl;
+                //std::cout << "fin calcul " << std::endl;
+            }
+            if (speady.status == RR::Robot::Status::DEAD)
+            {
+                //std::cout << " DEAD " << std::endl;
+                nbDead++;
+            }
+            else
+            {
+                //std::cout << " FINI " << std::endl;
+                nbFini++;
+            }
+            nbTrajet++;
+        }
+    }
+    std::cout<<nbFini << " vs " << nbDead<<std::endl;
 }
