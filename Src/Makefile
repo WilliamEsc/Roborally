@@ -31,6 +31,21 @@ all : test_board
 TARGETS += test_board
 CLEAN_OBJECTS += $(TEST_BOARD_OBJECTS)
 
+########## test_board ##########
+
+DUEL_SOURCES = duel.cpp 
+DUEL_OBJECTS = $(DUEL_SOURCES:.cpp=.o)
+
+duel : $(DUEL_OBJECTS) $(OBJECTS) $(HEADERS)
+	$(CXX) $(DUEL_OBJECTS) $(OBJECTS) -o $@ $(LDFLAGS)
+	
+$(DUEL_OBJECTS): %.o : %.cpp
+	$(CXX) -MMD $(CXXFLAGS) -c $< -o $@
+
+all : duel
+TARGETS += duel
+CLEAN_OBJECTS += $(DUEL_OBJECTS)
+
 ########## app ##########
 
 APP_SOURCES = app.cpp

@@ -108,7 +108,6 @@ void automata(Graph &g, RR::Robot twoB, int carte[MAIN], const Location &end)
                 int nb=contain(carte, bestVec, nbBon);
                 for (int i = 0; i < nb-nbBon; i++)
                 {
-                    
                     twoB = g.getRobot(twoB.location.line, twoB.location.column, (int)twoB.status, bestVec[i])->robot;
 
                 }
