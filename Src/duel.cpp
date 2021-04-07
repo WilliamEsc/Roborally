@@ -4,6 +4,7 @@
 #include "automata.cpp"
 #include <sys/time.h>
 #include <iostream>
+//collaboration avec ALLOMBERT-GOGET ADAM p1807279
 
 double timevalsub(struct timeval *tv1, const struct timeval *tv2)
 {
@@ -109,16 +110,18 @@ int main()
         }
         std::cout << "fin de la manche player1 n*" << i << "nb_tours = " << tours1 << std::endl;
         std::cout << "fin de la manche player2 n*" << i << "nb_tours = " << tours2 << std::endl;
-        if (tours1 < tours2)
+        if (player1.status == Robot::Status::DEAD && player2.status == Robot::Status::DEAD)
         {
-            victoire1++;
+            draw++;
         }
-        else if (tours2 < tours1)
+        else if (tours2 < tours1 || player1.status == Robot::Status::DEAD)
         {
             victoire2++;
         }
-        else
+        else if (tours1 < tours2 || player2.status == Robot::Status::DEAD)
         {
+            victoire1++;
+        }else{
             draw++;
         }
         total1 += tours1;
